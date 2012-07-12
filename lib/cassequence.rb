@@ -1,4 +1,6 @@
+require 'cassandra'
 require "cassequence/version"
+require 'cassequence/config'
 
 module Cassequence
 
@@ -18,6 +20,22 @@ module Cassequence
       yield @config
     end
 
+    def client
+      @config.client
+    end
+
+    def find_or_create_column_family(name)
+      if thing = client.column_families[name]
+        thing.comparator_type = 'org.apache.cassandra.db.marshal.DateType'
+      else
+        client.add_column_family Cassandra::ColumnFamily.new(
+          keyspace: config.key_space, 
+          name: name, 
+          comparator_type: 'org.apache.cassandra.db.marshal.DateType'
+        )
+      end
+
+    end
+
   end
 end
-

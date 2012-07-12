@@ -4,9 +4,9 @@ require File.expand_path('../lib/cassequence/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["lyon"]
   gem.email         = ["lyondhill@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{cassandra sequence querier}
+  gem.summary       = %q{This is a cassandra sequence querier. The data needs to be in a very specific format.}
+  gem.homepage      = "http://www.google.com"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -14,4 +14,9 @@ Gem::Specification.new do |gem|
   gem.name          = "cassequence"
   gem.require_paths = ["lib"]
   gem.version       = Cassequence::VERSION
+
+
+  gem.add_dependency 'cassandra'
+  gem.add_dependency 'thrift_client', '~> 0.7.0'
+
 end
