@@ -31,7 +31,7 @@ module Cassequence
       else
         client.add_column_family Cassandra::ColumnFamily.new(keyspace: config.key_space, name: name, comparator_type: 'org.apache.cassandra.db.marshal.DateType')
       end
-
+      true
     end
 
   end
