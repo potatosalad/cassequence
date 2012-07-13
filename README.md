@@ -36,7 +36,7 @@ def to_byte(time)
 end
 
 
-client.insert(:component_stats, 'b', { to_byte(Time.at(1993)) => {'man' => 'dude', 'woman' => 'dudette'}.to_json }, ttl: 36000)  
+client.insert(:slang, 'humans', { to_byte(Time.at(1993)) => {'man' => 'dude', 'woman' => 'dudette'}.to_json }, ttl: 36000)  
 
 ```
 
