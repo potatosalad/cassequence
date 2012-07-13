@@ -10,8 +10,9 @@ module Cassequence::Column
     end
     
     def column_family(name)
+      puts "COLUMNFAMILY: #{name}"
       self.column_family = name.to_s
-      Cassequence.find_or_create_column_family(name)
+      Cassequence.find_or_create_column_family(self.column_family)
     end
   end
   
@@ -20,7 +21,7 @@ module Cassequence::Column
     attr_accessor :raw
 
     def method_missing(meth, *args, &block)
-      result = JSON.parse(self.raw)[meth.to_s]
+      result = JSON.parse(@raw)[meth.to_s]
       if result
         result
       else
@@ -37,3 +38,6 @@ module Cassequence::Column
   end
 
 end
+
+
+

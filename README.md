@@ -1,6 +1,6 @@
 # Cassequence
 
-TODO: Write a gem description
+This will allow you to do sequence queries in cassandra
 
 ## Installation
 
@@ -18,7 +18,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+First things first. you need to have your data arranged in a specific way to get it to work
+
+it has to be arranged like this:
+
+
+
+``` ruby
+require 'cassequence'
+
+Cassequence.configure do |config|
+  config.host = '127.0.0.1'
+  config.port = 9160
+  config.key_space = 'Stats'
+end
+
+class ComponentStats
+  include Cassequence::Column
+
+  column_family :component_stats
+
+end
+
+```
 
 ## Contributing
 

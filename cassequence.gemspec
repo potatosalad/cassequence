@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Cassequence::VERSION
 
-
   gem.add_dependency 'cassandra'
   gem.add_dependency 'thrift_client', '~> 0.7.0'
 

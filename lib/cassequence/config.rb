@@ -18,7 +18,7 @@ module Cassequence
       self.password = nil
     end
 
-    def cassandra(reconnect = false)
+    def client(reconnect = false)
       if reconnect
         @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
       else
