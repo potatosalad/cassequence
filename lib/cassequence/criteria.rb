@@ -47,6 +47,7 @@ module Cassequence
       get_results
       self.result.count
     end
+    
   private
 
     def validate_hash
