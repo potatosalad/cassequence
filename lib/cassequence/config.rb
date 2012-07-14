@@ -5,22 +5,24 @@ module Cassequence
 
     attr_accessor :host
     attr_accessor :port
-    attr_accessor :username
-    attr_accessor :password
 
     attr_accessor :key_space 
 
     def initialize
+      self.host = '127.0.0.1'
+      self.port = 9160
       self.key_space = nil
-      self.username = nil
-      self.password = nil
     end
 
     def client(reconnect = false)
-      if reconnect
-        @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+      if self.host and self.port and self.key_space
+        if reconnect
+          @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+        else
+          @cassandra_client ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+        end
       else
-        @cassandra_client ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+        raise "I need a host, port, and key_space"        
       end
     end
 

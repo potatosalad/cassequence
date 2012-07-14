@@ -9,7 +9,11 @@ module Cassequence
   class << self
 
     def config=(data)
-      @config = data
+      if data.class == Cassequence::Config or data == nil
+        @config = data  
+      else
+        raise "I only accept the Cassequence::Config class"
+      end
     end
 
     def config
@@ -18,16 +22,15 @@ module Cassequence
     end
 
     def configure(&proc)
-      @config ||= Config.new
-      yield @config
+      yield config
     end
 
     def client
-      @config.client
+      config.client
     end
     
     def find_or_create_column_family(name)
-      @config.client.find_or_create_column_family(name)
+      config.find_or_create_column_family(name)
     end
 
   end

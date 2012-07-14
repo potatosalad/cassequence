@@ -36,7 +36,7 @@ def to_byte(time)
 end
 
 
-client.insert(:slang, 'humans', { to_byte(Time.at(1993)) => {'man' => 'dude', 'woman' => 'dudette'}.to_json }, ttl: 5.years)  
+client.insert(:slang, 'humans', { to_byte(Time.local(1993)) => {'man' => 'dude', 'woman' => 'dudette'}.to_json }, ttl: 5.years)  
 
 ```
 
