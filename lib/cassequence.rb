@@ -3,6 +3,9 @@ require "cassequence/version"
 require 'cassequence/config'
 require 'cassequence/column'
 require 'cassequence/criteria'
+require 'cassequence/extensions/float'
+require 'cassequence/extensions/string'
+require 'cassequence/extensions/integer'
 
 module Cassequence
 
