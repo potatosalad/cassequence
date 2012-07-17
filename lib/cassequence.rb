@@ -1,10 +1,12 @@
 require 'cassandra'
-require "cassequence/version"
 require 'cassequence/config'
 require 'cassequence/column'
+require "cassequence/version"
 require 'cassequence/criteria'
+require 'cassequence/extensions/time'
 require 'cassequence/extensions/float'
 require 'cassequence/extensions/string'
+require 'cassequence/extensions/boolean'
 require 'cassequence/extensions/integer'
 
 module Cassequence

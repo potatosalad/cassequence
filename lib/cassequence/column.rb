@@ -1,7 +1,3 @@
-require 'cassequence/extensions/float'
-require 'cassequence/extensions/string'
-require 'cassequence/extensions/integer'
-
 
 module Cassequence::Column
   module ClassMethods
@@ -14,9 +10,13 @@ module Cassequence::Column
       Cassequence::Criteria.new(hash, self)
     end
     
+    def default_type
+      self.default_types ||= {}
+    end
+
     def field(key, options = {})
       if type = options[:type]
-        self.default_types[key.to_sym] = type if type.class == Class
+        default_type[key.to_sym] = type if type.class == Class
       end
     end
 
@@ -52,9 +52,9 @@ module Cassequence::Column
     end
 
     def method_missing(meth, *args, &block)
-      result = convert_to_default(key)
+      result = convert_to_default(meth.to_s)
       # result = JSON.parse(@raw)[meth.to_s] rescue nil
-      if result
+      unless result == nil
         result
       else
         super # needs this
