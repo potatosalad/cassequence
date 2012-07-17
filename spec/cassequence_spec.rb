@@ -28,6 +28,7 @@ describe Cassequence do
     Cassequence.configure do |config|
       config.key_space = 'Stats'
     end
+    Cassequence.client(true)
     Cassequence.client.class.should == Cassandra
     Cassequence.client.keyspace.should == 'Stats'
     Cassequence.client.servers.should == ["127.0.0.1:9160"]

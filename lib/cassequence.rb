@@ -30,8 +30,8 @@ module Cassequence
       yield config
     end
 
-    def client
-      config.client
+    def client(reconnect = false)
+      config.client(reconnect)
     end
     
     def find_or_create_column_family(name)

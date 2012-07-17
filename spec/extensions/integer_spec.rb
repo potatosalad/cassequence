@@ -7,7 +7,7 @@ describe Integer do
   end
 
   it 'should not raise an error if it is given the correct data' do
-    Integer.from_string('1').should == 1
+    Integer.from_string('0').should == 0
     Integer.from_string('0123').should == 123
   end
 

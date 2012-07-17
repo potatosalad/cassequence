@@ -142,6 +142,13 @@ describe Cassequence::Criteria do
       @cri[2].should == @cri.result[2]
     end
 
+    it 'should get a count of how many there are in the result set' do
+      @cri.count.should > 0
+    end
+
+    it 'should return the results with a to_a' do
+      @cri.to_a.should == @cri.result
+    end
 
   end
 
@@ -202,6 +209,14 @@ describe Cassequence::Criteria do
       cri = SimpleClass.where(start: first, finish: last)
       cri.send :fix_times_order
       cri.query_hash.should == {start: first, finish: last}
+    end
+
+    it 'should make sure the time stamps are in the correct order reversed' do
+      first = Time.now - 1000
+      last = Time.now
+      cri = SimpleClass.where(start: first, finish: last, reversed: true)
+      cri.send :fix_times_order
+      cri.query_hash.should == {start: last, finish: first, reversed: true}
     end
 
     it 'will re order the timestamps if they are in the wrong order' do

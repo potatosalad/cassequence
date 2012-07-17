@@ -7,7 +7,7 @@ describe Time do
   end
 
   it 'should not raise an error if it is given the correct data' do
-    Time.from_string('1').to_s.should == '1969-12-31 17:00:01 -0700'
+    Time.from_string('0').to_s.should == '1969-12-31 17:00:00 -0700'
     Time.from_string('0123').to_s.should == '1969-12-31 17:02:03 -0700'
   end
 

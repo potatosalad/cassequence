@@ -38,12 +38,8 @@ module Cassequence
     end
 
     def validate_key_space
-      unless @cassandra_client.keyspaces.include?(self.key_space)
-        raise "Invalid Keyspace"
-      end
+      @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
     end
 
   end
 end
-
-
