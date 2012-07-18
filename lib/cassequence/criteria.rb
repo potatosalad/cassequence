@@ -32,7 +32,7 @@ module Cassequence
     def get_raw
       validate_hash
       data = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
-      data.values.map { |json|  json }
+      data.values.map { |json|  json }.to_json
     end
 
     def each(&proc)
