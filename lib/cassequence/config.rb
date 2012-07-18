@@ -24,7 +24,7 @@ module Cassequence
       else
         raise "I need a host, port, and key_space"        
       end
-      validate_key_space
+      # validate_key_space
       @cassandra_client
     end
 
