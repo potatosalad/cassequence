@@ -105,6 +105,28 @@ describe Cassequence::Criteria do
 
   end
 
+  describe 'get_raw' do
+    before :all do
+      Cassequence.config.key_space = 'Stats'
+      cli = Cassequence.client
+      @time = Time.now.to_i
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+    end
+
+    after :all do
+      Cassequence.client.truncate! 'Stats'
+    end
+
+    it 'should be able to get the whole result set' do
+      cri = SimpleClass.where(key: 'apple')
+      cri.get_raw.should == [{"time"=>@time, "num"=>1, "precise_num"=>2.34, "boo"=>true, "string"=>"hi"}, {"time"=>@time, "num"=>2, "precise_num"=>3.34, "boo"=>true, "string"=>"hi how"}, {"time"=>@time, "num"=>3, "precise_num"=>4.34, "boo"=>false, "string"=>"hi how are"}, {"time"=>@time, "num"=>4, "precise_num"=>5.34, "boo"=>false, "string"=>"hi how are you?"}]
+    end
+    
+  end
+
   describe 'pass_through' do
     before :all do
       Cassequence.config.key_space = 'Stats'
