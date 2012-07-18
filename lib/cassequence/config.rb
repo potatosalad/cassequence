@@ -35,6 +35,8 @@ module Cassequence
         client.add_column_family Cassandra::ColumnFamily.new(keyspace: self.key_space, name: name, comparator_type: 'org.apache.cassandra.db.marshal.DateType')
       end
       true
+    rescue
+      false
     end
 
     def validate_key_space
