@@ -38,6 +38,7 @@ module Cassequence
       end
       self.raw_result
     end
+    alias :raw :get_raw
 
     def each(&proc)
       get_results
