@@ -6,6 +6,7 @@ module Cassequence
     attr_accessor :klass
 
     attr_accessor :result
+    attr_accessor :raw_result
 
     def initialize(hash, kla)
       raise 'invalid type' unless hash.class == Hash and kla.class == Class
@@ -30,9 +31,12 @@ module Cassequence
     alias :all :get_results
 
     def get_raw
-      validate_hash
-      data = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
-      data.values.map { |json|  json }.to_json
+      unless self.raw_result      
+        validate_hash
+        self.raw_result = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+        self.raw_result.values.map { |json|  json }.to_json
+      end
+      self.raw_result
     end
 
     def each(&proc)
