@@ -1,3 +1,6 @@
+require 'oj'
+require 'multi_json'
+
 module Cassequence
 
   class Criteria
@@ -34,7 +37,7 @@ module Cassequence
       unless self.raw_result      
         validate_hash
         self.raw_result = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
-        self.raw_result = self.raw_result.values.map { |json|  json }.to_json
+        self.raw_result = self.raw_result.values.map { |json|  MultiJson.load(json) }
       end
       self.raw_result
     end
