@@ -4,6 +4,7 @@ module Cassequence
 
     attr_accessor :query_hash
     attr_accessor :klass
+
     attr_accessor :result
 
     def initialize(hash, kla)
@@ -30,7 +31,8 @@ module Cassequence
 
     def get_raw
       validate_hash
-      Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+      data = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+      data.values.map { |json|  json }
     end
 
     def each(&proc)
