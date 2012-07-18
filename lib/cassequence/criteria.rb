@@ -28,6 +28,11 @@ module Cassequence
     end
     alias :all :get_results
 
+    def get_raw
+      validate_hash
+      Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+    end
+
     def each(&proc)
       get_results
       self.result.each &proc

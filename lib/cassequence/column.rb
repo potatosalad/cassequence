@@ -34,9 +34,13 @@ module Cassequence::Column
       self.raw = raw_in
     end
 
+    def values
+      JSON.parse(@raw)
+    end
+
     def convert_to_default(key)
       begin
-        result = JSON.parse(@raw)[key.to_s] rescue nil
+        result = values[key.to_s] rescue nil
         if result
           if const = self.class.default_types[key.to_sym]
             const.from_string(result) rescue result
