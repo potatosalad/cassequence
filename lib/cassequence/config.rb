@@ -24,7 +24,7 @@ module Cassequence
       else
         raise "I need a host, port, and key_space"        
       end
-      # validate_key_space
+      validate_key_space
       @cassandra_client
     end
 
@@ -40,7 +40,12 @@ module Cassequence
     end
 
     def validate_key_space
-      @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
+      begin
+        @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
+      rescue Exception => e
+        @cassandra_client.disable_node_auto_discovery!
+        @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
+      end
     end
 
   end
