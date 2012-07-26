@@ -35,6 +35,30 @@ describe Cassequence::Column do
 
   end
 
+  describe 'insert' do
+
+    before :all do
+      Cassequence.config.key_space = 'Stats'
+    end
+
+    after :all do
+      Cassequence.client.truncate! 'component_stats'
+    end
+
+    it 'should insert data' do
+      SampleClass.insert('abc', {time: Time.now, num: 1, precise_num: 1.2, boo: true, string: 'hi', whatever: 'thing'})
+      SampleClass.where(key: 'abc').count.should == 1
+    end
+
+    it 'should raise an error if it is missing they key' do
+      lambda { SampleClass.insert({}) }.should raise_error
+    end
+
+    it 'should be able to accept options' do
+      SampleClass.insert('abc', {time: Time.now, num: 1, precise_num: 1.2, boo: true, string: 'hi', whatever: 'thing'}, ttl: 1).should == true
+    end
+  end
+
   describe 'field' do
     it 'should set a default_type on the class' do
       SampleClass.default_type.class.should == Hash

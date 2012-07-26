@@ -187,6 +187,54 @@ describe Cassequence::Criteria do
 
   end
 
+  describe 'max' do
+    before :all do
+      Cassequence.config.key_space = 'Stats'
+      cli = Cassequence.client
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+      @cri = SimpleClass.where(key: 'apple')
+    end
+
+    after :all do
+      Cassequence.client.truncate! 'Stats'
+    end
+
+    it 'should get the max no matter the field i pass it' do
+      @cri.max(:num).num.should == 4
+    end
+
+    it 'should bonk if i give it a field that doesnt exist' do
+      lambda { @cri.max(:nonya) }.should raise_error
+    end
+  end
+
+  describe 'max' do
+    before :all do
+      Cassequence.config.key_space = 'Stats'
+      cli = Cassequence.client
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+      @cri = SimpleClass.where(key: 'apple')
+    end
+
+    after :all do
+      Cassequence.client.truncate! 'Stats'
+    end
+
+    it 'should get the min no matter the field i pass it' do
+      @cri.min(:precise_num).precise_num.should == 2.34
+    end
+
+    it 'should bonk if i give it a field that doesnt exist' do
+      lambda { @cri.max(:nonya) }.should raise_error
+    end
+  end
+
   describe 'validate_hash_key' do
     it 'should raise if there is no key' do
       cri = SimpleClass.where(start: Time.now)

@@ -6,6 +6,11 @@ module Cassequence::Column
 
     attr_accessor :default_types
 
+    def insert(key, hash, options = {})
+      Cassequence.client.insert(self.column_family_name, key, { to_byte(Time.now) => hash.to_json }, options)
+      true
+    end
+
     def where(hash)
       Cassequence::Criteria.new(hash, self)
     end
@@ -24,6 +29,11 @@ module Cassequence::Column
       self.column_family_name = name.to_s
       c = Cassequence.find_or_create_column_family(self.column_family_name)
     end
+
+    def to_byte(time)
+      time = (time.to_f*1000).to_i
+      [time >> 32, time].pack('NN')  
+    end    
   end
   
   module InstanceMethods

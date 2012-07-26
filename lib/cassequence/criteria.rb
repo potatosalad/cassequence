@@ -68,6 +68,16 @@ module Cassequence
       self
     end
 
+    def max(symb)
+      get_results
+      self.result.max { |a,b| a.send(symb) <=> b.send(symb) }
+    end
+
+    def min(symb)
+      get_results
+      self.result.min { |a,b| a.send(symb) <=> b.send(symb) }
+    end
+
     def count
       get_results
       self.result.count
