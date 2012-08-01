@@ -43,6 +43,27 @@ module Cassequence
     end
     alias :raw :get_raw
 
+    def reduce(arr, interval = 900)
+      raise 'Arguements must be Array, Integer' unless arr.is_a?(Array) and interval.is_a?(Integer)
+      aggrogate = {}
+      count = {}
+      set_up_hash = arr.inject({}) { |h, ele| h[ele.to_s] = 0.0; h}
+      raw.each do |ele|
+        key = middle_of(ele['time'], interval).to_s
+        aggrogate[key] ||= set_up_hash.dup
+        count[key] ||= 0
+        count[key] += 1
+        arr.each { |guy| aggrogate[key][guy.to_s] += ele[guy.to_s]}
+      end
+      result = []
+      aggrogate.each do |key, value|
+        c = count[key]
+        arr.each { |guy| value[guy.to_s] = value[guy.to_s] / c }
+        result << ({'time' => key.to_i}.merge value)
+      end
+      result
+    end
+
     def each(&proc)
       get_results
       self.result.each &proc
@@ -100,7 +121,7 @@ module Cassequence
     end
     
     def key
-      @key ||= self.query_hash.delete(:key).to_s
+      @key ||= (self.query_hash[:key]) ? self.query_hash.delete(:key) : nil
     end
 
     def key=(string)
@@ -135,7 +156,7 @@ module Cassequence
     end
 
     def validate_hash_key
-      raise "I need a :key" unless self.query_hash.include? :key
+      raise "I need a :key" unless key
     end
 
     def validate_hash_nothing_crazy
@@ -146,7 +167,7 @@ module Cassequence
     end
 
     def validate_hash_types
-      raise ":key needs to be a String object" unless self.query_hash[:key].class == String
+      raise ":key needs to be a String object" unless key.is_a?(String)
       (raise ":start needs to be a Time object" unless self.query_hash[:start].class == Time) if self.query_hash[:start]
       (raise ":finish needs to be a Time object" unless self.query_hash[:finish].class == Time) if self.query_hash[:finish]
       (raise ":reversed needs to be a Boolean object" unless self.query_hash[:reversed] == true or self.query_hash[:reversed] == false) if self.query_hash[:reversed]
@@ -183,6 +204,10 @@ module Cassequence
     def to_byte(time)
       time = (time.to_f*1000).to_i
       [time >> 32, time].pack('NN')  
+    end
+
+    def middle_of(num, interval = 900)
+      num - (num % interval) + (interval / 2)
     end
 
   end

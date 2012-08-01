@@ -114,6 +114,7 @@ describe Cassequence::Criteria do
       cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
       cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
       cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+      sleep 1
     end
 
     after :all do
@@ -136,6 +137,7 @@ describe Cassequence::Criteria do
       cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
       cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
       @cri = SimpleClass.where(key: 'apple')
+      sleep 1
     end
 
     after :all do
@@ -187,79 +189,62 @@ describe Cassequence::Criteria do
 
   end
 
-  describe 'max' do
+  describe 'sub-sets' do
     before :all do
+      @num = Time.now.to_i
       Cassequence.config.key_space = 'Stats'
       cli = Cassequence.client
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => @num, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => @num, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => @num, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => @num, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
       @cri = SimpleClass.where(key: 'apple')
+      sleep 1
     end
 
     after :all do
       Cassequence.client.truncate! 'Stats'
     end
+    describe 'max' do
 
-    it 'should get the max no matter the field i pass it' do
-      @cri.max(:num).num.should == 4
+      it 'should get the max no matter the field i pass it' do
+        @cri.max(:num).num.should == 4
+      end
+
+      it 'should bonk if i give it a field that doesnt exist' do
+        lambda { @cri.max(:nonya) }.should raise_error
+      end
     end
 
-    it 'should bonk if i give it a field that doesnt exist' do
-      lambda { @cri.max(:nonya) }.should raise_error
-    end
-  end
+    describe 'max' do
+      it 'should get the min no matter the field i pass it' do
+        @cri.min(:precise_num).precise_num.should == 2.34
+      end
 
-  describe 'max' do
-    before :all do
-      Cassequence.config.key_space = 'Stats'
-      cli = Cassequence.client
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.34, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.34, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
-      @cri = SimpleClass.where(key: 'apple')
+      it 'should bonk if i give it a field that doesnt exist' do
+        lambda { @cri.max(:nonya) }.should raise_error
+      end
     end
 
-    after :all do
-      Cassequence.client.truncate! 'Stats'
+    describe 'avg' do
+      it 'should get the min no matter the field i pass it' do
+        @cri.avg(:precise_num).should == 3.84
+      end
+
+      it 'should get a avg for more then one key' do
+        @cri.avg([:num, :precise_num]).should == {:num=>2.5, :precise_num=>3.84}
+      end
+
+      it 'should bonk if i give it a field that doesnt exist' do
+        lambda { @cri.avg(:nonya) }.should raise_error
+      end
     end
 
-    it 'should get the min no matter the field i pass it' do
-      @cri.min(:precise_num).precise_num.should == 2.34
-    end
-
-    it 'should bonk if i give it a field that doesnt exist' do
-      lambda { @cri.max(:nonya) }.should raise_error
-    end
-  end
-
-  describe 'avg' do
-    before :all do
-      Cassequence.config.key_space = 'Stats'
-      cli = Cassequence.client
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.3, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
-      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.0, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
-      @cri = SimpleClass.where(key: 'apple')
-    end
-
-    after :all do
-      Cassequence.client.truncate! 'Stats'
-    end
-
-    it 'should get the min no matter the field i pass it' do
-      @cri.avg(:precise_num).should == 3.745
-    end
-
-    it 'should get a avg for more then one key' do
-      @cri.avg([:num, :precise_num]).should == {:num=>2.5, :precise_num=>3.745}
-    end
-
-    it 'should bonk if i give it a field that doesnt exist' do
-      lambda { @cri.avg(:nonya) }.should raise_error
+    describe 'reduce' do
+      it 'should only have one record that is the aggrogate at a speciffic time' do
+        new_guy = @num - (@num % 900) + (900 / 2)
+        @cri.reduce([:num, :precise_num]).should == [{'time' => new_guy, 'num' => 2.5, 'precise_num' =>3.84}]
+      end
     end
   end
 
