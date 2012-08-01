@@ -235,6 +235,34 @@ describe Cassequence::Criteria do
     end
   end
 
+  describe 'avg' do
+    before :all do
+      Cassequence.config.key_space = 'Stats'
+      cli = Cassequence.client
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 1, 'precise_num' => 2.34, 'boo' => true, 'string' => 'hi'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 2, 'precise_num' => 3.34, 'boo' => true, 'string' => 'hi how'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 3, 'precise_num' => 4.3, 'boo' => false, 'string' => 'hi how are'}.to_json }, ttl: 60)
+      cli.insert(:Stats, 'apple', { to_byte(Time.now) => { 'time' => Time.now.to_i, 'num' => 4, 'precise_num' => 5.0, 'boo' => false, 'string' => 'hi how are you?'}.to_json }, ttl: 60)
+      @cri = SimpleClass.where(key: 'apple')
+    end
+
+    after :all do
+      Cassequence.client.truncate! 'Stats'
+    end
+
+    it 'should get the min no matter the field i pass it' do
+      @cri.avg(:precise_num).should == 3.745
+    end
+
+    it 'should get a avg for more then one key' do
+      @cri.avg([:num, :precise_num]).should == {:num=>2.5, :precise_num=>3.745}
+    end
+
+    it 'should bonk if i give it a field that doesnt exist' do
+      lambda { @cri.avg(:nonya) }.should raise_error
+    end
+  end
+
   describe 'validate_hash_key' do
     it 'should raise if there is no key' do
       cri = SimpleClass.where(start: Time.now)

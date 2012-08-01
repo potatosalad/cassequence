@@ -26,7 +26,7 @@ module Cassequence
     def get_results
       unless self.result
         validate_hash
-        self.result = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+        self.result = Cassequence.client.get(self.klass.column_family_name, key, self.query_hash)
         self.result = self.result.values.map! { |json|  self.klass.new(json)}
       end
       self.result
@@ -36,7 +36,7 @@ module Cassequence
     def get_raw
       unless self.raw_result      
         validate_hash
-        self.raw_result = Cassequence.client.get(self.klass.column_family_name, self.query_hash.delete(:key).to_s, self.query_hash)
+        self.raw_result = Cassequence.client.get(self.klass.column_family_name, key, self.query_hash)
         self.raw_result = self.raw_result.values.map { |json|  MultiJson.load(json) }
       end
       self.raw_result
@@ -68,14 +68,25 @@ module Cassequence
       self
     end
 
-    def max(symb)
-      get_results
-      self.result.max { |a,b| a.send(symb) <=> b.send(symb) }
-    end
-
     def min(symb)
       get_results
       self.result.min { |a,b| a.send(symb) <=> b.send(symb) }
+    end
+
+    def avg(input)
+      get_results
+      if input.class == Array
+        average_these(input)
+      elsif input.class == Symbol
+        average_one(input)
+      else
+        raise 'I need a Symbol or an Array'    
+      end
+    end
+
+    def max(symb)
+      get_results
+      self.result.max { |a,b| a.send(symb) <=> b.send(symb) }
     end
 
     def count
@@ -88,7 +99,32 @@ module Cassequence
       self.result
     end
     
+    def key
+      @key ||= self.query_hash.delete(:key).to_s
+    end
+
+    def key=(string)
+      @key = string
+    end
+
   private
+
+    def average_these(arr)
+      # hash = arr.inject({}) {|hash, key| hash[key.to_sym] = 0.0; hash}
+      avg = result.inject(arr.inject({}) {|hash, key| hash[key.to_sym] = 0.0; hash}) do |hash, value|
+        data = MultiJson.load(value.raw)
+        arr.each {|key| hash[key.to_sym] += data[key.to_s].to_f}
+        hash
+      end
+      c = result.count
+      arr.each {|key| avg[key.to_sym] = avg[key.to_sym] / c }
+      avg
+    end
+
+    def average_one(symb)
+      avg = result.inject(0.0) { |float, element| float + MultiJson.load(element.raw)[symb.to_s]}
+      avg / result.count
+    end
 
     def validate_hash
       validate_hash_key
