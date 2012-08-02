@@ -44,7 +44,7 @@ module Cassequence
     alias :raw :get_raw
 
     def reduce(arr, interval = 900)
-      raise 'Arguements must be Array, Integer' unless arr.is_a?(Array) and interval.is_a?(Integer)
+      raise 'Arguements must be reduce(Array, Integer)' unless arr.is_a?(Array) and interval.is_a?(Integer)
       aggrogate = {}
       count = {}
       set_up_hash = arr.inject({}) { |h, ele| h[ele.to_s] = 0.0; h}
