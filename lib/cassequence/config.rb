@@ -14,6 +14,7 @@ module Cassequence
       self.host = '127.0.0.1'
       self.port = 9160
       self.key_space = nil
+      self.pool_size = 10
     end
 
     def new_clients
@@ -28,18 +29,26 @@ module Cassequence
       @cass_clients || new_clients
     end
 
+    def next_client
+      @current ||= 0
+      cassandra_clients[(@current = (@current + 1) % pool_size)]
+    end
+
     def client(reconnect = false)
+      validate_key_space
       if self.host and self.port and self.key_space
         if reconnect
-          @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+          new_clients
+          next_client
+          # @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
         else
-          @cassandra_client ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+          next_client
+          # cassandra_clients
+          # @cassandra_client ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
         end
       else
         raise "I need a host, port, and key_space"        
       end
-      validate_key_space
-      @cassandra_client
     end
 
     def find_or_create_column_family(name)
@@ -55,10 +64,10 @@ module Cassequence
 
     def validate_key_space
       begin
-        @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
+        cassandra_clients.first.keyspaces.include?(self.key_space) 
       rescue Exception => e
-        @cassandra_client.disable_node_auto_discovery!
-        @cassandra_client.keyspaces.include?(self.key_space) # will raise an error 
+        cassandra_clients.each { |cli| cli.disable_node_auto_discovery!}
+        cassandra_clients.each { |cli| cli.keyspaces.include?(self.key_space) }
       end
     end
 
