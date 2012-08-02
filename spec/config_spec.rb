@@ -9,7 +9,7 @@ describe Cassequence::Config do
       lambda { conf.client }.should raise_error
     end
 
-    it 'should keyspace if one does not exist' do
+    it 'should raise if keysapce does not exist' do
       conf = Cassequence::Config.new
       conf.key_space = 'notreal'
       lambda { conf.client }.should raise_error
