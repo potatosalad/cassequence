@@ -38,12 +38,14 @@ module Cassequence
       validate_key_space
       if self.host and self.port and self.key_space
         if reconnect
-          new_clients
-          next_client
+          Thread.current[:cass_client] = Cassandra.new(self.key_space, "#{self.host}:#{self.port}", {:retries => 10, :timeout => 15, :connect_timeout => 15})
+          # new_clients
+          # next_client
           # @cassandra_client = Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
         else
-          next_client
+          # next_client
           # cassandra_clients
+          Thread.current[:cass_client] ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}", {:retries => 10, :timeout => 15, :connect_timeout => 15})
           # @cassandra_client ||= Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
         end
       else
