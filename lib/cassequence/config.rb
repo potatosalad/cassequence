@@ -30,7 +30,8 @@ module Cassequence
     end
 
     def next_client
-      cassandra_clients[rand(cassandra_clients.length)]
+      @@current ||= 0
+      cassandra_clients[(@@current = (@@current + 1) % pool_size)]
     end
 
     def client(reconnect = false)
