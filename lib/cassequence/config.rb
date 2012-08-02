@@ -8,10 +8,24 @@ module Cassequence
 
     attr_accessor :key_space 
 
+    attr_accessor :pool_size
+
     def initialize
       self.host = '127.0.0.1'
       self.port = 9160
       self.key_space = nil
+    end
+
+    def new_clients
+      @cass_clients = []
+      pool_size.times do
+        @cass_clients << Cassandra.new(self.key_space, "#{self.host}:#{self.port}")
+      end
+      @cass_clients
+    end
+
+    def cassandra_clients
+      @cass_clients || new_clients
     end
 
     def client(reconnect = false)
