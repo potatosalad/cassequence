@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Cassequence::VERSION
 
   gem.add_dependency 'cassandra'
-  gem.add_dependency 'thrift_client', '~> 0.7.0'
+  gem.add_dependency 'thrift_client', '~> 0.8.0'
   gem.add_dependency 'oj'
   gem.add_dependency 'multi_json'
   gem.add_development_dependency 'rspec'
